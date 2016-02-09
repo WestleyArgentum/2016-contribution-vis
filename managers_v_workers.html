@@ -22,7 +22,8 @@ svg {
 var radius = 81,
     padding = 10;
 
-var color = d3.scale.category10();
+var color = d3.scale.ordinal()
+    .range(["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00"]);
 
 var arc = d3.svg.arc()
     .outerRadius(radius)
@@ -32,7 +33,7 @@ var pie = d3.layout.pie()
     .sort(null)
     .value(function(d) { return d.amount; });
 
-d3.csv("managers_v_workers.csv", function(error, data) {
+d3.csv("managers_v_workers_large.csv", function(error, data) {
   if (error) throw error;
 
   color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Group"; }));
