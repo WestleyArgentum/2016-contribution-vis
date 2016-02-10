@@ -115,7 +115,7 @@ parse(input, {delimiter: '\t'}, function(err, data) {
             company = row[2],
             job = row[1],
             candidate = row[7],
-            amount = parseInt(row[6].replace(/\$/g, ''));
+            amount = parseInt(row[6].replace(/\$/g, '').replace(/,/g, ''));
 
         if (candidate == 'NATIONAL DRAFT BEN CARSON FOR PRESIDENT COMMITTEE') {
             console.log('>>', amount, ' >>', row[6]);
