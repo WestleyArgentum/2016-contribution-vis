@@ -117,10 +117,6 @@ parse(input, {delimiter: '\t'}, function(err, data) {
             candidate = row[7],
             amount = parseInt(row[6].replace(/\$/g, '').replace(/,/g, ''));
 
-        if (candidate == 'NATIONAL DRAFT BEN CARSON FOR PRESIDENT COMMITTEE') {
-            console.log('>>', amount, ' >>', row[6]);
-        }
-
         if (googles.indexOf(company) > -1) {
             company = "google";
         }
@@ -145,9 +141,10 @@ parse(input, {delimiter: '\t'}, function(err, data) {
             byCandidate[candidate] = 0;
         }
 
-        byCandidate[candidate] += amount;
+        
 
         // if (amount >= 200) {
+            byCandidate[candidate] += amount;
             byCompany[company][job][candidate] += amount;
             byCompanyNoJob[company][candidate] += amount;
         // }
@@ -179,68 +176,72 @@ parse(input, {delimiter: '\t'}, function(err, data) {
     }
 
 
-    console.log(moreBernie);
-    console.log('========================')
-    console.log(moreHillary);
-
-    // // GOOGLE ---------
-    // console.log(byCompany['google']);
-    // console.log('+++++');
-    // console.log(byCompanyNoJob["google"]);
-
-    // var managerContribs = {};
-    // for (var i = 0; i < googleManagers.length; ++i) {
-    //     var contribs = byCompany["google"][googleManagers[i]];
-    //     for (cand in contribs) {
-    //         if (!managerContribs[cand]) {
-    //             managerContribs[cand] = 0;
-    //         }
-
-    //         managerContribs[cand] += contribs[cand];
-    //     }
-    // }
-
-    // var workerContribs = {};
-    // var totals = {};
-    // for (job in byCompany['google']) {
-    //     var contribs = byCompany["google"][job];
-    //     for (cand in contribs) {
-    //         if (!totals[cand]) {
-    //             totals[cand] = 0;
-    //         }
-    //         totals[cand] += contribs[cand];
-    //     }
-
-    //     if (googleManagers.indexOf(job) > -1) {
-    //         continue;
-    //     }
-
-    //     var contribs = byCompany["google"][job];
-    //     for (cand in contribs) {
-    //         if (!workerContribs[cand]) {
-    //             workerContribs[cand] = 0;
-    //         }
-
-    //         workerContribs[cand] += contribs[cand];
-    //     }
-    // }
+    // console.log(moreBernie);
+    // console.log('========================')
+    // console.log(moreHillary);
 
 
-    // console.log('-----------------------');
 
-    // console.log(managerContribs);
-    // console.log('=====');
-    // console.log(workerContribs);
-    // console.log('=====')
-    // console.log(totals);
 
-    // // -----------
+
+    // GOOGLE ---------
+    console.log(byCompany['google']);
+    console.log('+++++');
+    console.log(byCompanyNoJob["google"]);
+
+    var managerContribs = {};
+    for (var i = 0; i < googleManagers.length; ++i) {
+        var contribs = byCompany["google"][googleManagers[i]];
+        for (cand in contribs) {
+            if (!managerContribs[cand]) {
+                managerContribs[cand] = 0;
+            }
+
+            managerContribs[cand] += contribs[cand];
+        }
+    }
+
+    var workerContribs = {};
+    var totals = {};
+    for (job in byCompany['google']) {
+        var contribs = byCompany["google"][job];
+        for (cand in contribs) {
+            if (!totals[cand]) {
+                totals[cand] = 0;
+            }
+            totals[cand] += contribs[cand];
+        }
+
+        if (googleManagers.indexOf(job) > -1) {
+            continue;
+        }
+
+        var contribs = byCompany["google"][job];
+        for (cand in contribs) {
+            if (!workerContribs[cand]) {
+                workerContribs[cand] = 0;
+            }
+
+            workerContribs[cand] += contribs[cand];
+        }
+    }
+
+
+    console.log('-----------------------');
+
+    console.log(managerContribs);
+    console.log('=====');
+    console.log(workerContribs);
+    console.log('=====')
+    console.log(totals);
+
+    // -----------
 
 
     // // APPLE ---------
     // console.log(byCompany['apple']);
     // console.log('+++++');
-    // console.log(byCompanyNoJob["apple"]);
+    // // console.log(byCompanyNoJob["apple"]);
 
     // var managerContribs = {};
     // for (var i = 0; i < appleManagers.length; ++i) {
