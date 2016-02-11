@@ -1,5 +1,28 @@
 var parse = require('csv-parse'),
+    stringify = require('csv-stringify'),
     fs = require('fs');
+
+var recipients = [
+    "TRUMP, DONALD J",
+    "CRUZ, RAFAEL EDWARD TED",
+    "SANTORUM, RICHARD J.",
+    "SANTORUM, RICHARD J",
+    "SANDERS, BERNARD",
+    "CARSON, BENJAMIN S SR MD",
+    "CLINTON, HILLARY RODHAM",
+    "RUBIO, MARCO",
+    "BUSH, JEB",
+    "KASICH, JOHN R",
+    "CHRISTIE, CHRISTOPHER J",
+    "RIGHT TO RISE USA",
+    "RIGHT TO RISE PAC, INC.",
+    "AMERICA LEADS",
+    "CONSERVATIVE, AUTHENTIC, RESPONSIVE LEADERSHIP FOR YOU AND FOR AMERICA (CARLY FOR AMERICA)",
+    "READY PAC",
+    "CONSERVATIVE SOLUTIONS PAC",
+    "NATIONAL DRAFT BEN CARSON FOR PRESIDENT COMMITTEE",
+    "PRIORITIES USA ACTION"
+];
 
 var googles = [
     "adecco at google",
@@ -103,6 +126,60 @@ var apples = [
     "apple inc"
 ];
 
+function managerWorkerBreakdown(byCompany, company) {
+    var managerContribs = {};
+    for (var i = 0; i < googleManagers.length; ++i) {
+        var contribs = byCompany[company][googleManagers[i]];
+        for (cand in contribs) {
+            if (!managerContribs[cand]) {
+                managerContribs[cand] = 0;
+            }
+
+            managerContribs[cand] += contribs[cand];
+        }
+    }
+
+    var workerContribs = {};
+    var totals = {};
+    for (job in byCompany[company]) {
+        var contribs = byCompany[company][job];
+        for (cand in contribs) {
+            if (!totals[cand]) {
+                totals[cand] = 0;
+            }
+            totals[cand] += contribs[cand];
+        }
+
+        if (googleManagers.indexOf(job) > -1) {
+            continue;
+        }
+
+        var contribs = byCompany[company][job];
+        for (cand in contribs) {
+            if (!workerContribs[cand]) {
+                workerContribs[cand] = 0;
+            }
+
+            workerContribs[cand] += contribs[cand];
+        }
+    }
+
+
+    // console.log('-----------------------');
+
+    // console.log(managerContribs);
+    // console.log('=====');
+    // console.log(workerContribs);
+    // console.log('=====')
+    // console.log(totals);
+
+    return {
+        managerContribs: managerContribs,
+        workerContribs: workerContribs
+    }
+
+}
+
 var input = fs.readFileSync('2016-tech-contribs.txt');
 
 parse(input, {delimiter: '\t'}, function(err, data) {
@@ -122,6 +199,10 @@ parse(input, {delimiter: '\t'}, function(err, data) {
         }
         else if (apples.indexOf(company) > -1) {
             company = 'apple';
+        }
+
+        if (company == "google") {
+            console.log(row[1], row[6], row[7]);
         }
 
         if (!byCompany[company]) {
@@ -184,112 +265,32 @@ parse(input, {delimiter: '\t'}, function(err, data) {
 
 
 
-    // GOOGLE ---------
-    console.log(byCompany['google']);
-    console.log('+++++');
-    console.log(byCompanyNoJob["google"]);
+    // ---------
+    var companies = ['google','apple'];
 
-    var managerContribs = {};
-    for (var i = 0; i < googleManagers.length; ++i) {
-        var contribs = byCompany["google"][googleManagers[i]];
-        for (cand in contribs) {
-            if (!managerContribs[cand]) {
-                managerContribs[cand] = 0;
-            }
+    var outDict = {};
 
-            managerContribs[cand] += contribs[cand];
-        }
+    for (var i = 0; i < companies.length; ++i) {
+        outDict[companies[i]] = managerWorkerBreakdown(byCompany, companies[i]);
     }
 
-    var workerContribs = {};
-    var totals = {};
-    for (job in byCompany['google']) {
-        var contribs = byCompany["google"][job];
-        for (cand in contribs) {
-            if (!totals[cand]) {
-                totals[cand] = 0;
-            }
-            totals[cand] += contribs[cand];
-        }
+    console.log(outDict);
 
-        if (googleManagers.indexOf(job) > -1) {
-            continue;
-        }
+    var outArray = [
+        ['Group', 'Bernie', 'Hillary']
+    ];
 
-        var contribs = byCompany["google"][job];
-        for (cand in contribs) {
-            if (!workerContribs[cand]) {
-                workerContribs[cand] = 0;
-            }
-
-            workerContribs[cand] += contribs[cand];
-        }
+    for (var i = 0; i < companies.length; ++i) {
+        var company = companies[i];
+        outArray.push([company + ' managers', outDict[company]['managerContribs']['SANDERS, BERNARD'], outDict[company]['managerContribs']['CLINTON, HILLARY RODHAM']]);
+        outArray.push([company + ' workers', outDict[company]['workerContribs']['SANDERS, BERNARD'], outDict[company]['workerContribs']['CLINTON, HILLARY RODHAM']]);
     }
 
-
-    console.log('-----------------------');
-
-    console.log(managerContribs);
-    console.log('=====');
-    console.log(workerContribs);
-    console.log('=====')
-    console.log(totals);
+    stringify(outArray, function(err, output){
+        fs.writeFileSync('data.csv', output);
+    });
 
     // -----------
-
-
-    // // APPLE ---------
-    // console.log(byCompany['apple']);
-    // console.log('+++++');
-    // // console.log(byCompanyNoJob["apple"]);
-
-    // var managerContribs = {};
-    // for (var i = 0; i < appleManagers.length; ++i) {
-    //     var contribs = byCompany["apple"][appleManagers[i]];
-    //     for (cand in contribs) {
-    //         if (!managerContribs[cand]) {
-    //             managerContribs[cand] = 0;
-    //         }
-
-    //         managerContribs[cand] += contribs[cand];
-    //     }
-    // }
-
-    // var workerContribs = {};
-    // var totals = {};
-    // for (job in byCompany['apple']) {
-    //     var contribs = byCompany["apple"][job];
-    //     for (cand in contribs) {
-    //         if (!totals[cand]) {
-    //             totals[cand] = 0;
-    //         }
-    //         totals[cand] += contribs[cand];
-    //     }
-
-    //     if (appleManagers.indexOf(job) > -1) {
-    //         continue;
-    //     }
-
-    //     var contribs = byCompany["apple"][job];
-    //     for (cand in contribs) {
-    //         if (!workerContribs[cand]) {
-    //             workerContribs[cand] = 0;
-    //         }
-
-    //         workerContribs[cand] += contribs[cand];
-    //     }
-    // }
-
-
-    // console.log('-----------------------');
-
-    // console.log(managerContribs);
-    // console.log('=====');
-    // console.log(workerContribs);
-    // console.log('=====')
-    // console.log(totals);
-
-    // // -----------
 
 
 
